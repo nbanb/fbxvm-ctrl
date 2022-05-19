@@ -234,9 +234,9 @@ VM-3:  	id: 3 	 status: running 	name: 14RV-FSRV-02 	mac_address: 5a:e3:85:db:26
 VM-4:  	id: 4 	 status: stopped 	name: 14RV-FSRV-04 	mac_address: 5e:e3:3a:13:ab:20
 VM-5:  	id: 5 	 status: stopped 	name: 14RV-FSRV-05 	mac_address: be:dd:fc:cc:53:8d
 VM-6:   id: 6 	 status: stopped 	name: 14RV-FSRV-06 	mac_address: ba:81:13:4f:2f:4e
-VM-7:	  id: 7 	 status: stopped 	name: 14RV-FSRV-07 	mac_address: da:05:e4:43:33:5d
-VM-8:	  id: 8 	 status: stopped 	name: 14RV-FSRV-08 	mac_address: ce:3c:ee:b4:f4:f0
-VM-9:	  id: 9 	 status: stopped 	name: 14RV-FSRV-09 	mac_address: 02:44:40:c3:c7:2b
+VM-7:	id: 7 	 status: stopped 	name: 14RV-FSRV-07 	mac_address: da:05:e4:43:33:5d
+VM-8:	id: 8 	 status: stopped 	name: 14RV-FSRV-08 	mac_address: ce:3c:ee:b4:f4:f0
+VM-9:	id: 9 	 status: stopped 	name: 14RV-FSRV-09 	mac_address: 02:44:40:c3:c7:2b
 VM-10:	id: 10 	 status: running 	name: 14RV-FSRV-10 	mac_address: 66:35:fc:a1:6b:9f
 VM-11:	id: 11 	 status: stopped 	name: 14RV-FSRV-11 	mac_address: 5e:fb:d2:ad:01:5c
 VM-12:	id: 12 	 status: stopped 	name: 14RV-FSRV-12 	mac_address: a6:3a:0a:8d:2f:18
@@ -256,9 +256,9 @@ RESULT :
 
 VIRTUAL MACHINE DISK LIST : 
 
-DISK-2:  	  index: 2	name: 14RV-FSRV-00.qcow2	size: 2711289856 bytes
-DISK-4:  	  index: 4	name: 14RV-FSRV-01.qcow2	size: 10517544960 bytes
-DISK-6:  	  index: 6	name: 14RV-FSRV-02.qcow2	size: 6618480640 bytes
+DISK-2:  	index: 2	name: 14RV-FSRV-00.qcow2	size: 2711289856 bytes
+DISK-4:  	index: 4	name: 14RV-FSRV-01.qcow2	size: 10517544960 bytes
+DISK-6:  	index: 6	name: 14RV-FSRV-02.qcow2	size: 6618480640 bytes
 DISK-8:    	index: 8	name: 14RV-FSRV-03.qcow2	size: 2711289856 bytes
 DISK-10:  	index: 10	name: 14RV-FSRV-04.qcow2	size: 2711289856 bytes
 DISK-12:  	index: 12	name: 14RV-FSRV-05.qcow2	size: 2711289856 bytes
