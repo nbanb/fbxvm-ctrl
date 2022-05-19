@@ -1,10 +1,10 @@
 # fbxvm-ctrl
 Tool for managing Freebox Delta Virtual Machines using API (fbx-delta-nba_bash_api.sh)
-
-
-README describing usage and example when using fbxvm-ctrl program
-
 #### To be run on Freebox Delta hardware from FREE (French Internet Provider)
+
+
+#### README: usage and example to use fbxvm-ctrl program
+
 
 sourcing lib : fbx-delta-nba_bash_api.sh
 
@@ -36,8 +36,8 @@ MY_APP_TOKEN="4uZTLMMwSyiPB42tSCWLpSSZbXIYi+d+F32tVMx2j1p8oSUUk4Awr/OMZne4RRlY"
 
 #### Now you can update fbxvm-ctrl with your just obtained values.
 ```bash
-MY_APP_ID= 
-MY_APP_TOKEN= just obtained values.
+MY_APP_ID="YourNewFBXVM.app" 
+MY_APP_TOKEN="YourNewFBXVM.app.JustObtainToken"
 ```
 
 That's all, now you are ready to use this tool which allow you to control your Freebox Delta's VM directly 
