@@ -10,9 +10,14 @@ sourcing lib : fbx-delta-nba_bash_api.sh
 You can get the library here on this branch (at the time I'm writing, changes are not merged on the original project, so use the branch):
 https://github.com/nbanb/fbx-delta-nba_bash_api.sh/tree/nbanb-freebox-api
 
+You need to have `curl` and `openssl` installed.
+
+Get the source:
+
+    $ curl -L https://github.com/nbanb/fbx-delta-nba_bash_api.sh/raw/nbanb-freebox-api/fbx-delta-nba_bash_api.sh > fbx-delta-nba_bash_api.sh
+
 
 First get a token which allow this app to login Feebox Delta API :
-
 
 #### *  authorize_application *app_id* *app_name* *app_version* *device_name*
 It is used to obtain a token to identify a new application (need to be done only once)
