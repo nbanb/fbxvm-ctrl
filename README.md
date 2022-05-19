@@ -4,7 +4,7 @@ tool for managing Freebox Delta Virtual Machines using API (fbx-delta-nba_bash_a
 
 README describing usage and example when using fbxvm-ctrl program
 
-####To be run on Freebox Delta hardware from FREE (French Internet Provider)
+#### To be run on Freebox Delta hardware from FREE (French Internet Provider)
 
 sourcing lib : fbx-delta-nba_bash_api.sh
 
@@ -20,7 +20,7 @@ Get the source:
 
 First get a token which allow this app to login Feebox Delta API :
 
-#### *  authorize_application *app_id* *app_name* *app_version* *device_name*
+####   authorize_application *app_id* *app_name* *app_version* *device_name*
 It is used to obtain a token to identify a new application (need to be done only once)
 ##### Example
 ```bash
