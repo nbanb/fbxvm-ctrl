@@ -4,7 +4,12 @@ tool for managing Freebox Delta Virtual Fachines using API (fbx-delta-nba_bash_a
 
 README describing usage and example when using fbxvm-ctrl program
 To be run on Freebox Delta hardware from FREE (French Internet Provider)
+
 sourcing lib : fbx-delta-nba_bash_api.sh
+
+You can get the library here on this branch (at the time I'm writing, changes are not merged on the original project, so use the branch):
+https://github.com/nbanb/fbx-delta-nba_bash_api.sh/tree/nbanb-freebox-api
+
 
 First get a token which allow this app to login Feebox Delta API :
 
@@ -22,7 +27,10 @@ MY_APP_ID="MyWonderfull.app"
 MY_APP_TOKEN="4uZTLMMwSyiPB42tSCWLpSSZbXIYi+d+F32tVMx2j1p8oSUUk4Awr/OMZne4RRlY"
 ```
 
+Now you can update fbxvm-ctrl with your MY_APP_ID= and MY_APP_TOKEN= just obtained values.
 
+That's all, now you are ready to use this tool which allow you to control your Freebox Delta's VM directly 
+from your current bash session 
 
 --------------------------------------------------------------------------------------------------------------------
 #####---> Help : 
