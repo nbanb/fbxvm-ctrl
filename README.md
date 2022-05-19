@@ -3,6 +3,8 @@ Tool for managing Freebox Delta Virtual Machines using API (fbx-delta-nba_bash_a
 #### To be run on Freebox Delta hardware from FREE (French Internet Provider)
 
 
+
+--------------------------------------------------------------------------------------------------------------------
 #### README: usage and example to use fbxvm-ctrl program
 
 
