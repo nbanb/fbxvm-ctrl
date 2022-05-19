@@ -33,7 +33,7 @@ That's all, now you are ready to use this tool which allow you to control your F
 from your current bash session 
 
 --------------------------------------------------------------------------------------------------------------------
-#####---> Help : 
+---> Help : 
 --------------------------------------------------------------------------------------------------------------------
 ```bash
 fbxvm-ctrl USE FREEBOX REST API TO MANAGE FREEBOX-DELTA VIRTUAL MACHINES
@@ -89,7 +89,7 @@ MODE ('console' only options) :
 ```
   
 --------------------------------------------------------------------------------------------------------------------
-#####---> Help output on specific (major) command  
+---> Help output on specific (major) command  
 --------------------------------------------------------------------------------------------------------------------  
 ```bash
 
@@ -196,7 +196,7 @@ When modifying VM, if you do not explicitly specify on the cmdline 'cloudinit_us
 
 ``` 
 --------------------------------------------------------------------------------------------------------------------
-#####---> Output of informative command  (list, listdisk, detail)
+---> Output of informative command  (list, listdisk, detail)
 --------------------------------------------------------------------------------------------------------------------  
 ```bash
  $ fbxvm-ctrl list
