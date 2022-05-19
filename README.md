@@ -125,7 +125,7 @@ fbxvm-ctrl resize disk disk_shrink="0" disk_path="/freeboxdisk/vmdiskpath/myvmdi
 ```
 --------------------------------------------------------------------------------------------------------------------
 ```bash	
-fbxvm-ctrl del disk 14RV-FSRV-133.qcow2
+$ fbxvm-ctrl del disk 14RV-FSRV-133.qcow2
 
 ERROR: you must specify the option "disk_path="
 
@@ -163,7 +163,7 @@ fbxvm-ctrl add vm disk_type="qcow2" disk_path="/freeboxdisk/vmdiskpath/myvmdisk.
 --------------------------------------------------------------------------------------------------------------------
 ```bash
 
-fbxvm-ctrl del vm
+$ fbxvm-ctrl del vm
 
 ERROR: you must specify a VM id
 
@@ -206,7 +206,7 @@ When modifying VM, if you do not explicitly specify on the cmdline 'cloudinit_us
 ---> Output of informative command  (list, listdisk, detail)
 --------------------------------------------------------------------------------------------------------------------  
 ```bash
- $ fbxvm-ctrl list
+$ fbxvm-ctrl list
 
  CONTROL FREEBOX VM
 
