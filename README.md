@@ -20,12 +20,12 @@ Get the source:
 
 First get a token which allow this app to login Feebox Delta API :
 
-####   authorize_application *app_id* *app_name* *app_version* *device_name*
+#### *  authorize_application *app_id* *app_name* *app_version* *device_name*
 It is used to obtain a token to identify a new application (need to be done only once)
 ##### Example
 ```bash
 $ source ./fbx-delta-nba_bash_api.sh
-$ authorize_application  'MyWonderfull.app'  'My Wonderfull App'  '1.0.0'  'Mac OSX'
+$ authorize_application  'MyWonderfull.app'  'My Wonderfull App'  '1.0.0'  'Deb 11'
 Please grant/deny access to the app on the Freebox LCD...
 Authorization granted
 
