@@ -1,5 +1,5 @@
 # fbxvm-ctrl
-tool for managing Freebox Delta Virtual Machines using API (fbx-delta-nba_bash_api.sh)
+Tool for managing Freebox Delta Virtual Machines using API (fbx-delta-nba_bash_api.sh)
 
 
 README describing usage and example when using fbxvm-ctrl program
@@ -33,10 +33,13 @@ MY_APP_ID="MyWonderfull.app"
 MY_APP_TOKEN="4uZTLMMwSyiPB42tSCWLpSSZbXIYi+d+F32tVMx2j1p8oSUUk4Awr/OMZne4RRlY"
 ```
 
-Now you can update fbxvm-ctrl with your MY_APP_ID= and MY_APP_TOKEN= just obtained values.
+
+#### Now you can update fbxvm-ctrl with your MY_APP_ID= and MY_APP_TOKEN= just obtained values.
+
 
 That's all, now you are ready to use this tool which allow you to control your Freebox Delta's VM directly 
 from your current bash session 
+
 
 --------------------------------------------------------------------------------------------------------------------
 ---> Help : 
