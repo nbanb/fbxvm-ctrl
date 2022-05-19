@@ -1,5 +1,5 @@
 # fbxvm-ctrl
-tool for managing Freebox Delta Virtual Fachines using API (fbx-delta-nba_bash_api.sh)
+tool for managing Freebox Delta Virtual Machines using API (fbx-delta-nba_bash_api.sh)
 
 
 README describing usage and example when using fbxvm-ctrl program
@@ -41,6 +41,8 @@ from your current bash session
 ---> Help : 
 --------------------------------------------------------------------------------------------------------------------
 ```bash
+$ fbxvm-ctrl
+
 fbxvm-ctrl USE FREEBOX REST API TO MANAGE FREEBOX-DELTA VIRTUAL MACHINES
 
 usage: ./fbxvm-ctrl list
