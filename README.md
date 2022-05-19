@@ -4,8 +4,12 @@ Tool for managing Freebox Delta Virtual Machines using API (fbx-delta-nba_bash_a
 
 
 
+
+
 --------------------------------------------------------------------------------------------------------------------
-#### README: usage and example to use fbxvm-ctrl program
+### README: usage and example to use fbxvm-ctrl program
+--------------------------------------------------------------------------------------------------------------------
+
 
 
 sourcing lib : fbx-delta-nba_bash_api.sh
