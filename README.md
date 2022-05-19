@@ -34,8 +34,11 @@ MY_APP_TOKEN="4uZTLMMwSyiPB42tSCWLpSSZbXIYi+d+F32tVMx2j1p8oSUUk4Awr/OMZne4RRlY"
 ```
 
 
-#### Now you can update fbxvm-ctrl with your MY_APP_ID= and MY_APP_TOKEN= just obtained values.
-
+#### Now you can update fbxvm-ctrl with your just obtained values.
+```bash
+MY_APP_ID= 
+MY_APP_TOKEN= just obtained values.
+```
 
 That's all, now you are ready to use this tool which allow you to control your Freebox Delta's VM directly 
 from your current bash session 
