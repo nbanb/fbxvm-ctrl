@@ -40,7 +40,13 @@ MY_APP_TOKEN="4uZTLMMwSyiPB42tSCWLpSSZbXIYi+d+F32tVMx2j1p8oSUUk4Awr/OMZne4RRlY"
 ```
 
 
-#### Now you can update fbxvm-ctrl with your just obtained values.
+#### Now you can download & update fbxvm-ctrl with your just obtained values.
+```bash
+$ curl -L https://raw.githubusercontent.com/nbanb/fbxvm-ctrl/main/fbxvm-ctrl >fbxvl-ctrl 
+$ chmod +x fbxvm-ctrl
+```
+
+Update `fbxvm-ctrl` program with your just obtain values :
 ```bash
 MY_APP_ID="YourNewFBXVM.app" 
 MY_APP_TOKEN="YourNewFBXVM.app.JustObtainToken"
