@@ -237,7 +237,7 @@ RESULT :
 
 VIRTUAL MACHINE ID, NAME, MAC AND STATUS : 
 
-VM-0:	  id: 0 	 status: stopped 	name: 14RV-FSRV-00 	mac_address: ce:3e:20:b9:66:fc
+VM-0:   id: 0 	 status: stopped 	name: 14RV-FSRV-00 	mac_address: ce:3e:20:b9:66:fc
 VM-1:  	id: 1 	 status: stopped 	name: 14RV-FSRV-03 	mac_address: 3e:6e:bd:2b:fe:c7
 VM-2:  	id: 2 	 status: running 	name: 14RV-FSRV-01 	mac_address: ae:2c:8c:f6:3e:fb
 VM-3:  	id: 3 	 status: running 	name: 14RV-FSRV-02 	mac_address: 5a:e3:85:db:26:ee
