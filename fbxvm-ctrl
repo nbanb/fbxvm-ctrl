@@ -195,7 +195,7 @@ feed_vm_variables () {
 		[[ "${nameparam}" == "cloudinit_hostname" ]] && cloudinit_hostname[$idvm]=${valueparam}
 		[[ "${nameparam}" == "cloudinit_userdata" ]] &&  ci_userdata=1 \
 		&& local ud=$(sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/\\n/g' ${valueparam}) \
-		&& userdata[$idvm]=$(echo ${ud})   # converting yaml file to one-line yaml
+		&& userdata[$idvm]=$ud   # converting yaml file to one-line yaml
 
 	        ((idparam++))
 
@@ -249,7 +249,7 @@ create_vm_variables () {
                 [[ "${nameparam}" == "cloudinit_hostname" ]] && local cloudinit_hostname=${valueparam}
                 [[ "${nameparam}" == "cloudinit_userdata" ]] \
                 && local ud=$(sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/\\n/g' ${valueparam}) \
-                && local userdata=$(echo ${ud})   # converting yaml file to one-line yaml
+                && local userdata=$ud   # converting yaml file to one-line yaml
 
                 #echo "idparam $idparam : param[$idparam] : ${param[$idparam]}"  #debug 
                 ((idparam++))
