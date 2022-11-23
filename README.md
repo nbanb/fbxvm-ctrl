@@ -229,7 +229,7 @@ $ fbxvm-ctrl list
 
  CONTROL FREEBOX VM
 
-URL CALLED : https://fbx.soartist.net:2059/api/v8/
+URL CALLED : https://fbx.mydomain.net:2011/api/v9/
 API CALLED : vm
 VERB|VM ID : list
 ACTION : disk
@@ -258,7 +258,7 @@ $ fbxvm-ctrl listdisk /FBX-2000G/box-vm/
 
 CONTROL FREEBOX VM
 
-URL CALLED : https://fbx.soartist.net:2059/api/v8/
+URL CALLED : https://fbx.mydomain.net:2011/api/v9/
 API CALLED : vm
 VERB|VM ID : listdisk
 ACTION : /FBX-2000G/box-vm/
@@ -306,7 +306,7 @@ $ fbxvm-ctrl 12 detail
 
 CONTROL FREEBOX VM
 
-URL CALLED : https://fbx.soartist.net:2059/api/v8/
+URL CALLED : https://fbx.mydomain.net:2011/api/v9/
 API CALLED : vm
 VERB|VM ID : 12
 ACTION : detail
