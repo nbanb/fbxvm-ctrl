@@ -1,10 +1,9 @@
 #! /bin/bash
-# NBA :   
 # NBA :         Written by nbanba for managing Freebox Delta Virtual Machines 
-# NBA :           Licence : GNU - use, modify, redistribute ... and Enjoy !                 
-# NBA :   
-# NBA : This software is not provide by Free (vendor of Freebox Delta) => use at your own risk !         
 # NBA :             
+# NBA :         Licence : GNU - use, modify, redistribute, sell ... but Enjoy !                 
+# NBA :   
+# NBA :  This software is not provide by Free (vendor of Freebox Delta) => use at your own risk !         
 ##################################################################################################
 # NBA : 20211114 
 # NBA : Application to control VMs on Freebox Delta
@@ -34,6 +33,17 @@
 # NBA : - keeping existing REST HTTP API functionnalities : start, stop, restart, shutdown 
 # NBA : - keeping existing WEBSOCKET API functionnalities : console
 #
+# NBA : 20220625 
+# NBA : Modifying print_vm_summary() to use "id" in replacement of "name" in while confdition
+# NBA : The 'list' command now list all VM even if some VM do not have a "name" 
+#
+# NBA : 20221123
+# NBA : merging and propaging change proposed by Frederic Crozat (github commit : b3fe47b & fa9c9de)
+# NBA : changes are : 
+# NBA :    --> correcting cloudinit userdata indentation
+# NBA :    --> ensure disk_path is correctly encoded in base64
+# NBA : Also modifying cd_path in all functions to ensure it's correctly encoded in base64 
+# 
 ##################################################################################################
 #    
 #
@@ -61,8 +71,8 @@ white='\033[01;37m'
 white='\033[01;37m' 
 norm='\033[00m'
 
-vmid="$1"
-action="$2"
+vmid=$1
+action=$2
 mode="$3"
 
 
@@ -83,7 +93,7 @@ print_vm_summary () {
 	local i=0
 	answer=$(call_freebox_api "/$API/")
 	dump_json_keys_values "$answer" >/dev/null
-	while [[ $(get_json_value_for_key "$answer" "result[$i].name") != "" ]] 
+	while [[ $(get_json_value_for_key "$answer" "result[$i].id") != "" ]] 
 	do
 		name=$(get_json_value_for_key "$answer" "result[$i].name")
 		id=$(get_json_value_for_key "$answer" "result[$i].id")
@@ -104,6 +114,7 @@ get_vm_object_var () {
 local i=0
 answer=$(call_freebox_api "/$API/")
 dump_json_keys_values "$answer" >/dev/null
+#dump_json_keys_values "$answer" 
 
 while [[ $(get_json_value_for_key "$answer" "result[$i].name") != "" ]] 
 do
@@ -127,9 +138,13 @@ do
 
 	vm_object_[$i]="{\"mac\":${mac[$i]},\"cloudinit_userdata\":${userdata[$i]},\"cd_path\":${cd_path[$i]},\"id\":${id[$i]},\"os\":${os[$i]},\"enable_cloudinit\":${cloudinit[$i]},\"disk_path\":${disk_path[$i]},\"vcpus\":${vcpus[$i]},\"memory\":${memory[$i]},\"name\":${name[$i]},\"cloudinit_hostname\":${cloudinit_hostname[$i]},\"status\":${state[$i]},\"bind_usb_ports\":${usb[$i]},\"enable_screen\":${enable_screen[$i]},\"disk_type\":${disk_type[$i]}}"
 
+        #echo -e "${vm_object_[$i]}\n" 
         ((i++))
 done
 }
+#get_vm_object_var 
+#echo -e "${vm_object_[0]}\n"
+#echo -e "${vm_object_[@]}"| tr " " "\n" 
 
 print_vm_detail () {
 
@@ -187,7 +202,7 @@ feed_vm_variables () {
 		[[ "${nameparam}" == "memory" ]] && memory[$idvm]=${valueparam}
 		[[ "${nameparam}" == "disk_type" ]] && disk_type[$idvm]=${valueparam}
 		[[ "${nameparam}" == "disk_path" ]] && disk_path[$idvm]=$(echo -n ${valueparam}|base64)
-		[[ "${nameparam}" == "cd_path" ]] && cd_path[$idvm]=$(echo ${valueparam}|base64)
+		[[ "${nameparam}" == "cd_path" ]] && cd_path[$idvm]=$(echo -n ${valueparam}|base64)
 		[[ "${nameparam}" == "enable_screen" ]] && enable_screen[$idvm]=${valueparam}
 		[[ "${nameparam}" == "bind_usb_ports" ]] && bind_usb=1 && usb[$idvm]=${valueparam}
 		[[ "${nameparam}" == "os" ]] && os[$idvm]=${valueparam}
@@ -196,11 +211,13 @@ feed_vm_variables () {
 		[[ "${nameparam}" == "cloudinit_userdata" ]] &&  ci_userdata=1 \
 		&& local ud=$(sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/\\n/g' ${valueparam}) \
 		&& userdata[$idvm]=$ud   # converting yaml file to one-line yaml
-
+		#echo "idparam $idparam : param[$idparam] : ${param[$idparam]}"  #debug 
 	        ((idparam++))
 
 	done
 
+
+# echo cloudinit_userdata=${userdata[$idvm]}     # debug cloud-init
 
 	# Convert text to boolean
 [[ "${cloudinit[$idvm]}" == "true" ]] && cloudinit[$idvm]="1" || cloudinit[$idvm]="0"
@@ -241,7 +258,7 @@ create_vm_variables () {
                 [[ "${nameparam}" == "memory" ]] && local memory=${valueparam}
                 [[ "${nameparam}" == "disk_type" ]] && local disk_type=${valueparam}
                 [[ "${nameparam}" == "disk_path" ]] && local disk_path=$(echo -n ${valueparam}|base64)
-                [[ "${nameparam}" == "cd_path" ]] && local cd_path=$(echo ${valueparam}|base64)
+                [[ "${nameparam}" == "cd_path" ]] && local cd_path=$(echo -n ${valueparam}|base64)
                 [[ "${nameparam}" == "enable_screen" ]] && local enable_screen=${valueparam}
                 [[ "${nameparam}" == "bind_usb_ports" ]] && local usb=${valueparam}
                 [[ "${nameparam}" == "os" ]] && local os=${valueparam}
@@ -255,6 +272,7 @@ create_vm_variables () {
                 ((idparam++))
         done
 
+	# echo cloudinit_userdata=${userdata}     # debug cloud-init
 
         # Convert text to boolean
 [[ "${cloudinit}" == "true" ]] && cloudinit="1" || cloudinit="0"
@@ -262,6 +280,7 @@ create_vm_variables () {
 
 vm_object_create="{\"cloudinit_userdata\":\"${userdata}\",\"cd_path\":\"${cd_path}\",\"os\":\"${os}\",\"enable_cloudinit\":\"${cloudinit}\",\"disk_path\":\"${disk_path}\",\"vcpus\":\"${vcpus}\",\"memory\":\"${memory}\",\"name\":\"${name}\",\"cloudinit_hostname\":\"${cloudinit_hostname}\",\"bind_usb_ports\":[${usb}],\"enable_screen\":\"${enable_screen}\",\"disk_type\":\"${disk_type}\"}"
 
+#echo -e "\nvm_object_create :\n${vm_object_create}\n"  # debug vm_object_create
 }
 
 feeds_vmdisk_variables () {
@@ -283,8 +302,10 @@ feeds_vmdisk_variables () {
                 [[ "${nameparam}" == "size" ]] && size=${valueparam}
                 [[ "${nameparam}" == "disk_shrink" ]] &&  shrink_allow=${valueparam}
 
+                #echo "idparam $idparam : param[$idparam] : ${param[$idparam]}"  #debug 
                 ((idparam++))
         done
+        # echo cloudinit_userdata=${userdata}     # debug cloud-init
 
         # Convert text to boolean
 [[ "${shrink_allow}" == "true" ]] && shrink_allow="1" || shrink_allow="0"
@@ -308,6 +329,7 @@ del () {
 # call 'del_vm' or 'del_disk' function depending on cmdline 2nd param
 	[[ "$1" == "vm" ]] && del_vm ${@:2}
 	[[ "$1" == "disk" ]] && del_disk ${@}
+	#[[ "$1" == "disk" ]] && echo del_disk ${@} && del_disk ${@}
 }	
 
 del_disk () {
@@ -334,12 +356,15 @@ del_disk () {
                 && echo ${resdel} |grep -q '{"success":true' >/dev/null \
                 && echo -e "${WHITE}operation completed, deleting finished ${norm}${PURPL}task #${task_id}${norm}${WHITE}: ${GREEN}${resdel}${norm}" \
                 || echo -e "${WHITE}operation completed, deleting finished ${norm}${PURPL}task #${task_id}${norm}${WHITE}: ${RED}${resdel}${norm} \n"
+#del_freebox_api  "/fs/tasks/${task_id}" 
 }
 
 list_vm_disk () {
         echo -e "\n${WHITE}VIRTUAL MACHINE DISK LIST : ${norm}\n"       
 	local vm_disk_path=$(echo -n "$1"|base64)
+	#echo vm_disk_path=$vm_disk_path
 	local answer=$(call_freebox_api "/fs/ls/${vm_disk_path}" 2>&1)
+	#echo $answer
 	local i=0
 	while [[ $(get_json_value_for_key "$answer" "result[$i].name") != "" ]] 
 		do
@@ -372,6 +397,7 @@ add_disk () {
 	        && exit 263
 
 	local result=$(add_freebox_api "/$API/disk/create" "${vmdisk_object_create}" 2>&1)
+	echo result: ${result}
 	create_vmdisk_task_id=$(get_json_value_for_key "${result}" result.id)
         [ -z "${create_vmdisk_task_id}" ] \
         && echo -e "\nERROR: ${RED}${result}${norm}" \
@@ -437,6 +463,8 @@ add_vm () {
 	local result=$(add_freebox_api "/$API/" "${vm_object_create}" 2>&1)
 	local result_one_line=$(echo  "${result}"|sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/\\n/g')
     	local new_vm_id=$(get_json_value_for_key "${result_one_line}" result.id)
+	#echo result_one_line:$result_one_line       # debug result
+	#echo new_vm_id:$new_vm_id                   # debug new_vm_id
         [[ "${result}" =~ ^"{\"success\":true" ]] \
         && echo -e "
 ${WHITE}$(print_vm_detail ${new_vm_id}|sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/\\n/g')${norm}
@@ -450,6 +478,7 @@ ${WHITE}VM creation status:${norm} ${RED} ${result}
 
 del_vm () {
         local idvm="$1"
+	#echo "del_freebox_api \"/$API/$idvm\" {};"     # debug
 	local result=$(del_freebox_api "/$API/$idvm" {}  2>&1;)
         [[ "${result}" =~ ^"{\"success\":true" ]] \
 	&& echo -e "
@@ -487,6 +516,7 @@ modify_vm () {
                 #echo -e "\tjson_vm_object_modif = ${BLUE}${vm_object_modif[$idvm]}${norm}\n"    # debug
 		#echo -e "\tjson_vm_object = ${BLUE}${vm_object_[$idvm]}${norm}\n"    # debug
 
+	#echo update_freebox_api "/$API/$vmid" "${vm_object_modif[$idvm]}" ;   # debug
 	echo -e "
 
 ${WHITE}VM-${vmid} modification status:${norm} $(
@@ -501,6 +531,7 @@ update_freebox_api "/$API/$vmid"  "${vm_object_modif[$idvm]}" \
 # usage
 
 usage () {
+#if [[ -z "$1" || -z "$2" ]]; 
 if [[ -z "$1" ]]; 
 	then 
 	echo -e "\n${WHITE}${0/.\//} USE FREEBOX REST API TO MANAGE FREEBOX-DELTA VIRTUAL MACHINES${norm}\n" 
@@ -629,15 +660,18 @@ name=|vcpu=|memory=|disk_type=|disk_path=|cd_path=|os=|enable_screen=|bind_usb_p
         && echo -e "\nERROR: ${RED}id must be a number!\n${norm}" \
         && exit 293
 
+
 [[ "$1" == "del" ]] && [[ "$2" == "disk" ]] \
         && [[ "$(echo $3|cut -d= -f1)" != "disk_path" ]] && echo -e "\nERROR: ${RED}you must specify the option \"disk_path=\"${norm}\n\nEXAMPLE:\n${BLUE}fbxvm-ctrl del disk disk_path=\"/FBX-2000G/box-vm/14RV-FSRV-49.qcow2\" ${norm}\n" \
         && exit 294
+
 
 [[ "$1" == "del" ]] && [[ "$2" == "disk" ]] \
         && [ -n "$3" ] && [ "$3" -eq "$3" ] 2>/dev/null \
         && [ $? -ne 0 ] \
         && echo -e "\nERROR: ${RED}id must be a number!\n${norm}" \
         && exit 291
+
 
 [[ "$1" == "resize" ]] && [[ "$2" != "disk" ]] \
 	&& echo -e "\nERROR: ${RED}resize need \"disk\" parameter \n${norm}" \
@@ -652,8 +686,10 @@ name=|vcpu=|memory=|disk_type=|disk_path=|cd_path=|os=|enable_screen=|bind_usb_p
         && echo -e "\nPlease run ${0/.\//} with no parameters to get usage\n" \
         && exit 301
 
+
 # <action> $2 must be one of start|shutdown|stop|restart|detail|console
 # test $2 only if $1 != list or add or del
+	#[[ "$1" != "list" ]] \
 	[[ "$1" != "list" && "$1" != "listdisk" && "$1" != "add" && "$1" != "del" && "$1" != "resize" ]] \
 	&& [[ "$2" != "start" \
 	&& "$2" != "stop" \
@@ -704,7 +740,7 @@ check_ext_tool () {
 # check external tool
 check_tool curl
 check_tool openssl
-check_tool websocat
+#check_tool websocat
 
 # checking external tools for console : direct / detached / screen 
 [[ "${action}" == "console" ]] && check_tool websocat
@@ -715,6 +751,7 @@ check_tool websocat
 
 # MAIN 
 usage ${vmid} ${action}
+#testparam ${vmid} ${action} ${mode} 
 testparam ${@} 
 check_ext_tool
 
@@ -728,7 +765,7 @@ echo -e "VERB|VM ID : ${WHITE}${vmid}${norm}"
 #answer=$(call_freebox_api "/$API/")
 #dump_json_keys_values "$answer" >/dev/null
 #debug#dump_json_keys_values "$answer" 
-echo -e "RESULT :"
+#echo -e "RESULT :"
 
 
 # verb & action
@@ -752,5 +789,9 @@ case "${action}" in
 esac
 
 echo
+
+#full=$(get_json_value_for_key "$answer" "result")
+#echo $full
+#vmdesc=$(echo $full |egrep $1)
 
 
