@@ -186,7 +186,7 @@ feed_vm_variables () {
 		[[ "${nameparam}" == "vcpus" ]] && vcpus[$idvm]=${valueparam}
 		[[ "${nameparam}" == "memory" ]] && memory[$idvm]=${valueparam}
 		[[ "${nameparam}" == "disk_type" ]] && disk_type[$idvm]=${valueparam}
-		[[ "${nameparam}" == "disk_path" ]] && disk_path[$idvm]=$(echo ${valueparam}|base64)
+		[[ "${nameparam}" == "disk_path" ]] && disk_path[$idvm]=$(echo -n ${valueparam}|base64)
 		[[ "${nameparam}" == "cd_path" ]] && cd_path[$idvm]=$(echo ${valueparam}|base64)
 		[[ "${nameparam}" == "enable_screen" ]] && enable_screen[$idvm]=${valueparam}
 		[[ "${nameparam}" == "bind_usb_ports" ]] && bind_usb=1 && usb[$idvm]=${valueparam}
@@ -195,7 +195,7 @@ feed_vm_variables () {
 		[[ "${nameparam}" == "cloudinit_hostname" ]] && cloudinit_hostname[$idvm]=${valueparam}
 		[[ "${nameparam}" == "cloudinit_userdata" ]] &&  ci_userdata=1 \
 		&& local ud=$(sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/\\n/g' ${valueparam}) \
-		&& userdata[$idvm]=$(echo ${ud})   # converting yaml file to one-line yaml
+		&& userdata[$idvm]=$ud   # converting yaml file to one-line yaml
 
 	        ((idparam++))
 
@@ -240,7 +240,7 @@ create_vm_variables () {
                 [[ "${nameparam}" == "vcpus" ]] && local vcpus=${valueparam}
                 [[ "${nameparam}" == "memory" ]] && local memory=${valueparam}
                 [[ "${nameparam}" == "disk_type" ]] && local disk_type=${valueparam}
-                [[ "${nameparam}" == "disk_path" ]] && local disk_path=$(echo ${valueparam}|base64)
+                [[ "${nameparam}" == "disk_path" ]] && local disk_path=$(echo -n ${valueparam}|base64)
                 [[ "${nameparam}" == "cd_path" ]] && local cd_path=$(echo ${valueparam}|base64)
                 [[ "${nameparam}" == "enable_screen" ]] && local enable_screen=${valueparam}
                 [[ "${nameparam}" == "bind_usb_ports" ]] && local usb=${valueparam}
@@ -249,7 +249,7 @@ create_vm_variables () {
                 [[ "${nameparam}" == "cloudinit_hostname" ]] && local cloudinit_hostname=${valueparam}
                 [[ "${nameparam}" == "cloudinit_userdata" ]] \
                 && local ud=$(sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/\\n/g' ${valueparam}) \
-                && local userdata=$(echo ${ud})   # converting yaml file to one-line yaml
+                && local userdata=$ud   # converting yaml file to one-line yaml
 
                 #echo "idparam $idparam : param[$idparam] : ${param[$idparam]}"  #debug 
                 ((idparam++))
