@@ -1,7 +1,7 @@
 #! /bin/bash
 # NBA :         Written by nbanba for managing Freebox Delta Virtual Machines 
 # NBA :             
-# NBA :         Licence : GNU - use, modify, redistribute, sell ... but Enjoy !                 
+# NBA :         Licence : GPLv3 - use, modify, redistribute, sell ... but Enjoy !                 
 # NBA :   
 # NBA :  This software is not provide by Free (vendor of Freebox Delta) => use at your own risk !         
 ##################################################################################################
@@ -43,7 +43,19 @@
 # NBA :    --> correcting cloudinit userdata indentation
 # NBA :    --> ensure disk_path is correctly encoded in base64
 # NBA : Also modifying cd_path in all functions to ensure it's correctly encoded in base64 
-# 
+#
+# NBA : 20221208
+# NBA : adding support of files download in library to download ISO or prebuilt VM image 
+#
+# NBA : 20221222-20230123
+# NBA : adding list_fs_file function for listing files
+# NBA : speeding up list_disk function and adding faster 'lst_dsk' (which print virtual size)  
+# NBA : fixing issue in get_vm_object_var when vmid does not exist but vmid+1 exist  
+# NBA : fixing issue (forgot first param) in add_vm
+#
+# NBA : 20250405
+# NBA : modifying sourcing context due to new library args
+#
 ##################################################################################################
 #    
 #
@@ -68,7 +80,6 @@ purpl='\033[01;35m'
 PURPL='\033[35m' 
 WHITE='\033[37m' 
 white='\033[01;37m' 
-white='\033[01;37m' 
 norm='\033[00m'
 
 vmid=$1
@@ -78,7 +89,10 @@ mode="$3"
 
 # source fbx-delta-nba_bash_api.sh from the current directory 
 
+no_arg_sourcing_context () {
 source ${0/`basename $0`/}/fbx-delta-nba_bash_api.sh
+}
+no_arg_sourcing_context
 
 # login
 
@@ -92,6 +106,7 @@ print_vm_summary () {
 
 	local i=0
 	answer=$(call_freebox_api "/$API/")
+	# caching json results in env to avoid performance issue
 	dump_json_keys_values "$answer" >/dev/null
 	while [[ $(get_json_value_for_key "$answer" "result[$i].id") != "" ]] 
 	do
@@ -99,7 +114,8 @@ print_vm_summary () {
 		id=$(get_json_value_for_key "$answer" "result[$i].id")
 		mac=$(get_json_value_for_key "$answer" "result[$i].mac")
 		state=$(get_json_value_for_key "$answer" "result[$i].status")
-		if [ ! -z "$name" ];
+		#if [ ! -z "$name" ];
+		if [ ! -z "$id" ];
 			then
 			echo -e "VM-$i:\t${red}id: ${id}${norm} $([ "$state" == "running" ] && echo -e "\t status: ${green}${state}${norm}" || echo -e "\t status: ${purpl}${state}${norm}") \tname: $name \tmac_address: $mac" 
 		fi
@@ -113,30 +129,34 @@ get_vm_object_var () {
 
 local i=0
 answer=$(call_freebox_api "/$API/")
+# caching json results in env to avoid performance issue
 dump_json_keys_values "$answer" >/dev/null
 #dump_json_keys_values "$answer" 
 
-while [[ $(get_json_value_for_key "$answer" "result[$i].name") != "" ]] 
+#while [[ $(get_json_value_for_key "$answer" "result[$i].name") != "" ]] 
+while [[ $(get_json_value_for_key "$answer" "result[$i].id") != "" ]] 
 do
-        mac[$i]=$(get_json_value_for_key "$answer" "result[$i].mac")
-        userdata[$i]=$(get_json_value_for_key "$answer" "result[$i].cloudinit_userdata")
-        cd_path[$i]=$(get_json_value_for_key "$answer" "result[$i].cd_path")
-        id[$i]=$(get_json_value_for_key "$answer" "result[$i].id")
-        os[$i]=$(get_json_value_for_key "$answer" "result[$i].os")
-        cloudinit[$i]=$(get_json_value_for_key "$answer" "result[$i].enable_cloudinit")
-        disk_path[$i]=$(get_json_value_for_key "$answer" "result[$i].disk_path")
-        vcpus[$i]=$(get_json_value_for_key "$answer" "result[$i].vcpus")
-        memory[$i]=$(get_json_value_for_key "$answer" "result[$i].memory")
-	name[$i]=$(get_json_value_for_key "$answer" "result[$i].name")
-	cloudinit_hostname[$i]=$(get_json_value_for_key "$answer" "result[$i].cloudinit_hostname")
-        state[$i]=$(get_json_value_for_key "$answer" "result[$i].status")
-        usb_0[$i]=$(get_json_value_for_key "$answer" "result[$i].bind_usb_ports[0]")
-        usb_1[$i]=$(get_json_value_for_key "$answer" "result[$i].bind_usb_ports[1]")
-        usb[$i]=$(echo "[\"${usb_0[$i]}\",\"${usb_1[$i]}\"]")
-        enable_screen[$i]=$(get_json_value_for_key "$answer" "result[$i].enable_screen")
-        disk_type[$i]=$(get_json_value_for_key "$answer" "result[$i].disk_type")
+	local j=$(get_json_value_for_key "$answer" "result[$i].id")
+	mac[$j]=$(get_json_value_for_key "$answer" "result[$i].mac")
+        userdata[$j]=$(get_json_value_for_key "$answer" "result[$i].cloudinit_userdata")
+        cd_path[$j]=$(get_json_value_for_key "$answer" "result[$i].cd_path")
+        id[$j]=$(get_json_value_for_key "$answer" "result[$i].id")
+        os[$j]=$(get_json_value_for_key "$answer" "result[$i].os")
+        cloudinit[$j]=$(get_json_value_for_key "$answer" "result[$i].enable_cloudinit")
+        disk_path[$j]=$(get_json_value_for_key "$answer" "result[$i].disk_path")
+        vcpus[$j]=$(get_json_value_for_key "$answer" "result[$i].vcpus")
+        memory[$j]=$(get_json_value_for_key "$answer" "result[$i].memory")
+	name[$j]=$(get_json_value_for_key "$answer" "result[$i].name")
+	cloudinit_hostname[$j]=$(get_json_value_for_key "$answer" "result[$i].cloudinit_hostname")
+        state[$j]=$(get_json_value_for_key "$answer" "result[$i].status")
+        usb_0[$j]=$(get_json_value_for_key "$answer" "result[$i].bind_usb_ports[0]")
+        usb_1[$j]=$(get_json_value_for_key "$answer" "result[$i].bind_usb_ports[1]")
+        usb[$j]=$(echo "[\"${usb_0[$j]}\",\"${usb_1[$j]}\"]")
+        enable_screen[$j]=$(get_json_value_for_key "$answer" "result[$i].enable_screen")
+        disk_type[$j]=$(get_json_value_for_key "$answer" "result[$i].disk_type")
 
-	vm_object_[$i]="{\"mac\":${mac[$i]},\"cloudinit_userdata\":${userdata[$i]},\"cd_path\":${cd_path[$i]},\"id\":${id[$i]},\"os\":${os[$i]},\"enable_cloudinit\":${cloudinit[$i]},\"disk_path\":${disk_path[$i]},\"vcpus\":${vcpus[$i]},\"memory\":${memory[$i]},\"name\":${name[$i]},\"cloudinit_hostname\":${cloudinit_hostname[$i]},\"status\":${state[$i]},\"bind_usb_ports\":${usb[$i]},\"enable_screen\":${enable_screen[$i]},\"disk_type\":${disk_type[$i]}}"
+	vm_object_[$j]="{\"mac\":${mac[$j]},\"cloudinit_userdata\":${userdata[$j]},\"cd_path\":${cd_path[$j]},\"id\":${id[$j]},\"os\":${os[$j]},\"enable_cloudinit\":${cloudinit[$j]},\"disk_path\":${disk_path[$j]},\"vcpus\":${vcpus[$j]},\"memory\":${memory[$j]},\"name\":${name[$j]},\"cloudinit_hostname\":${cloudinit_hostname[$j]},\"status\":${state[$j]},\"bind_usb_ports\":${usb[$j]},\"enable_screen\":${enable_screen[$j]},\"disk_type\":${disk_type[$j]}}"
+	#vm_object_[$i]="{\"mac\":${mac[$i]},\"cloudinit_userdata\":${userdata[$i]},\"cd_path\":${cd_path[$i]},\"id\":${id[$i]},\"os\":${os[$i]},\"enable_cloudinit\":${cloudinit[$i]},\"disk_path\":${disk_path[$i]},\"vcpus\":${vcpus[$i]},\"memory\":${memory[$i]},\"name\":${name[$i]},\"cloudinit_hostname\":${cloudinit_hostname[$i]},\"status\":${state[$i]},\"bind_usb_ports\":${usb[$i]},\"enable_screen\":${enable_screen[$i]},\"disk_type\":${disk_type[$i]}}"
 
         #echo -e "${vm_object_[$i]}\n" 
         ((i++))
@@ -241,14 +261,13 @@ fi
 
 
 create_vm_variables () {
-[ -z "$1" ] && echo "function feed_vm_variables take at least 'id' and 'param' argument" && exit 34
+[ -z "$1" ] && echo "function create_vm_variables take at least 'id' and 'param' argument" && exit 34
 
         local param=("${@}")
         local idparam=0
         local nameparam=("")
         local valueparam=("")
         vm_object_create=("")
-
         while [[ "${param[$idparam]}" != "" ]] 
         do
                 nameparam=$(echo "${param[$idparam]}"|cut -d= -f1)
@@ -359,32 +378,121 @@ del_disk () {
 #del_freebox_api  "/fs/tasks/${task_id}" 
 }
 
+
+# Adding this function as a replacemnt of "list_vm_disk ()" which suffer of performance issues
+# and which not providing disk image virtual size
+list_vm_dsk () {
+	#export action=listdisk && source fbx-delta-nba_bash_api.sh
+	export action=listdisk
+	echo -e "\n${WHITE}VIRTUAL MACHINE DISK LIST (qcow2, raw, iso, img): ${norm}\n"       
+        local dsk_file_path=$(echo -n "$1"|base64)
+        local answer=$(call_freebox_api "/fs/ls/${dsk_file_path}" 2>&1)
+        local idx=(`dump_json_keys_values ${answer} |egrep ].index |cut -d' ' -f3`)
+        local name=(`dump_json_keys_values ${answer} |egrep ].name |cut -d' ' -f3`)
+        local size=(`dump_json_keys_values ${answer} |egrep ].size |cut -d' ' -f3`)
+        local modification=(`dump_json_keys_values ${answer} |egrep ].modification |cut -d' ' -f3`)
+        local mimetype=(`dump_json_keys_values ${answer} |egrep ].mimetype |cut -d' ' -f3`)
+
+        local i=0 j=0
+        while [[ "${name[$i]}" != "" ]];
+        do
+		if [[ "${mimetype[$i]}" == "application/x-qemu-disk" ||\
+                      "${mimetype[$i]}" == "application/vnd.freebox.raw-disk-image" ||\
+                      "${mimetype[$i]}" == "application/x-raw-disk-image" ||\
+                      "${mimetype[$i]}" == "application/x-cd-image" ]]
+                then
+			#echo name=${name[$i]}
+		modification[$i]=$(date "+%Y%m%d-%H:%M:%S" -d@${modification[$i]})
+                #local nc=$(echo -n "${name[$i]}"|wc -m) savename=${name[$i]}
+                #[[ "$nc" -gt "4" && "$nc" -lt "10" ]] && name[$i]="${name[$i]}\t\t\t"
+                #[[ "$nc" -gt "9" && "$nc" -lt "17" ]] && name[$i]="${name[$i]}\t\t"
+                #[[ "$nc" -gt "16" && "$nc" -lt "26" ]] && name[$i]="${name[$i]}\t"
+                #[[ "$nc" -gt "25" ]] && name[$i]="${name[$i]}"
+		       #local vszdmp=$(add_freebox_api /vm/disk/info "{\"disk_path\": \"${dsk_file_path}$(echo -n /${savename}|base64)\"}" 2>/dev/null)
+		       local vszdmp=$(add_freebox_api /vm/disk/info "{\"disk_path\": \"${dsk_file_path}$(echo -n /${name[$i]}|base64)\"}" 2>/dev/null)
+		       local vsize=$(get_json_value_for_key "$vszdmp" "result.virtual_size") 
+		       local sizeprint=""  vsizeprint=""	
+		       [[ "${size[$i]}" -lt "10240" ]] && sizeprint="${size[$i]} B"
+		       [[ "${size[$i]}" -ge "10240" ]] && sizeprint="$((${size[$i]}/1024)) K" 	
+		       [[ "${size[$i]}" -gt "1048576" ]] && sizeprint="$((${size[$i]}/1048576)) M" 
+	               [[ "${size[$i]}" -gt "10737418240" ]]&& sizeprint="$((${size[$i]}/1073741824)) G" 
+		       [[ "${vsize}" -lt "10240" ]] && vsizeprint="$((${vsize})) B"
+		       [[ "${vsize}" -ge "10240" ]] && vsizeprint="$((${vsize}/1024)) K"
+		       [[ "${vsize}" -gt "1048576" ]] && vsizeprint="$((${vsize}/1048576)) M"
+		       [[ "${vsize}" -gt "10737418240" ]] && vsizeprint="$((${vsize}/1073741824)) G"
+		       [[ "${vsize}" == "" ]] && vsizeprint="RUNNING"
+                       #echo -e "$j: \t${RED}idx: ${idx[$i]}${norm}  \tname: ${GREEN}${name[$i]}${norm}\tsize: ${PURPL}${sizeprint}${norm}\tvirt: ${PURPL}${vsizeprint}${norm}\t${modification[$i]}${norm}" 
+                       echo -e "$j: \t${RED}idx: ${idx[$i]}${norm}  \tsize: ${PURPL}${sizeprint}${norm}\tvirt: ${PURPL}${vsizeprint}${norm}\t${modification[$i]}${norm}\tname: ${GREEN}${name[$i]}${norm}" 
+                       ((j++))
+                fi
+       ((i++))
+       done
+       export action=''
+echo
+}
+
+
+
+
 list_vm_disk () {
         echo -e "\n${WHITE}VIRTUAL MACHINE DISK LIST : ${norm}\n"       
 	local vm_disk_path=$(echo -n "$1"|base64)
-	#echo vm_disk_path=$vm_disk_path
+	#echo vm_disk_path=$vm_disk_path    # debug
 	local answer=$(call_freebox_api "/fs/ls/${vm_disk_path}" 2>&1)
-	#echo $answer
-	local i=0
+        # NBA 20230122: for better performances caching json results in env
+        dump_json_keys_values "$answer" >/dev/null
+	local i=0 j=0
 	while [[ $(get_json_value_for_key "$answer" "result[$i].name") != "" ]] 
 		do
-        		local type=$(get_json_value_for_key "$answer" "result[$i].type")
       		  	local index=$(get_json_value_for_key "$answer" "result[$i].index")
-        		local link=$(get_json_value_for_key "$answer" "result[$i].link")
-       		 	local modification=$(get_json_value_for_key "$answer" "result[$i].modification")
-        		local hidden=$(get_json_value_for_key "$answer" "result[$i].hidden")
+       		# 	local modification=$(get_json_value_for_key "$answer" "result[$i].modification")
         		local mimetype=$(get_json_value_for_key "$answer" "result[$i].mimetype")
         		local name=$(get_json_value_for_key "$answer" "result[$i].name")
-        		local path=$(get_json_value_for_key "$answer" "result[$i].path")
         		local size=$(get_json_value_for_key "$answer" "result[$i].size")
-				if [[ "$mimetype" == "application/x-qemu-disk" ]]
+				if [[ "$mimetype" == "application/x-qemu-disk" ||\
+				      "$mimetype" == "application/vnd.freebox.raw-disk-image" ||\
+				      "$mimetype" == "application/x-raw-disk-image" ||\
+				      "$mimetype" == "application/x-cd-image" ]]
 					then
-       					echo -e "DISK-$i:  \t${RED}index: ${index}${norm}\tname: ${GREEN}${name}${norm}\tsize: ${PURPL}${size} bytes${norm}" 
+       					#echo -e "DISK-$j:  \t${RED}index: ${index}${norm}\tname: ${GREEN}${name}${norm}\tsize: ${PURPL}${size} bytes${norm}" 
+       					echo -e "DISK-$j:  \t${RED}index: ${index}${norm}\tsize: ${PURPL}${size} bytes${norm}\tname: ${GREEN}${name}${norm}" 
+					((j++))
 				fi
 		((i++))
 		done
 echo
 }
+
+# adding function to list file and directory - performance issue by design 
+# NBA 20230122: for better performances caching json results in env
+# NBA 20230122: from today, speed became acceptable
+list_fs_file () {
+        local fs_file_path=$(echo -n "$1"|base64)
+        echo -e "\n${WHITE}LIST CONTENT IN : ${1}  ${norm}\n"
+        #echo fs_file_path=$fs_file_path       # debug
+        local answer=$(call_freebox_api "/fs/ls/${fs_file_path}" 2>&1)
+
+	# caching json results in env to avoid performance issue
+	dump_json_keys_values "$answer" >/dev/null
+
+        local i=0 j=0
+        while [[ $(get_json_value_for_key "$answer" "result[$i].name") != "" ]]
+                do
+                        local type=$(get_json_value_for_key "$answer" "result[$i].type")
+                        local index=$(get_json_value_for_key "$answer" "result[$i].index")
+                        local link=$(get_json_value_for_key "$answer" "result[$i].link")
+                        local modification=$(get_json_value_for_key "$answer" "result[$i].modification")
+                        local hidden=$(get_json_value_for_key "$answer" "result[$i].hidden")
+                        local mimetype=$(get_json_value_for_key "$answer" "result[$i].mimetype")
+                        local name=$(get_json_value_for_key "$answer" "result[$i].name")
+                        local size=$(get_json_value_for_key "$answer" "result[$i].size")
+                        echo -e "${RED}idx: ${index}${norm}\tname: ${GREEN}${name}${norm}\tsize: ${PURPL}${size} bytes${norm}\t${GREEN}${type}${norm}\t${WHITE}${hidden}\t${modification}${norm}"
+                	((i++))
+                done
+echo
+}
+
+
 
 add_disk () {
         feeds_vmdisk_variables ${@:2}
@@ -456,7 +564,8 @@ resize_disk () {
 
 add_vm () {
         local idvm="$1"
-        create_vm_variables ${vmid} ${@:3}
+        #create_vm_variables ${vmid} ${@:3}
+        create_vm_variables ${vmid} ${@:2}
 
 	#echo -e "\ncall_freebox_api \"/$API\"  \"${vm_object_create}\""   # debug call_freebox_api 
 		
@@ -555,7 +664,7 @@ if [[ -z "$1" ]];
    	 - console   : connect VM console
 "	
 	echo -e "OBJECT : - vm        : freebox delta virtual machine 
-         - disk      : freebox delta virtual machine
+         - disk      : freebox delta virtual machine disk
 "
   	echo -e "PARAM :  - name=                : name of this VM - VM-only (string, max 31 characters) 
          - vcpu=                : number of virtual CPUs to allocate to this VM - VM-only (integer)
@@ -771,8 +880,10 @@ echo -e "VERB|VM ID : ${WHITE}${vmid}${norm}"
 # verb & action
 
 case "${vmid}" in
-	list) print_vm_summary && exit 29 ; ;;
-	listdisk) list_vm_disk ${@:2} && exit 33 ; ;;
+	#list) print_vm_summary && exit 29 ; ;;
+	list) list_vm && exit 29 ; ;;
+	#listdisk) list_vm_disk ${@:2} && exit 33 ; ;;
+	listdisk) list_vm_dsk ${@:2} && exit 33 ; ;;
 	add) add ${@:2}; ;;
 	del) del ${@:2}; ;;
 	resize) resize_disk ${@:2}; ;;
