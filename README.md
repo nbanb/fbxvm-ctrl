@@ -1,9 +1,28 @@
 # fbxvm-ctrl
-Tool for managing Freebox Delta Virtual Machines using API (fbx-delta-nba_bash_api.sh)
-#### To be run on Freebox Delta hardware from FREE (French Internet Provider)
+### Tool for managing Freebox Delta Virtual Machines using API (fbx-delta-nba_bash_api.sh)
+
+<br />
+
+#### To be run on Freebox Delta / Ultra hardware from FREE (French Internet Provider)
 
 
+<a name="TOOLS"></a>
+#### External tools needed to use this porgram:
 
+
+|Type| Name | Description | Link |
+|:-|:-|:-|:-|
+|$${\color{red}\text{Required}}$$| $${\color{red}\text{ curl }}$$ | $${\color{red}\text{needed for all API call}}$$ |[curl](https://github.com/curl/curl)|
+|$${\color{red}\text{Required}}$$| $${\color{red}\text{ openssl }}$$ | $${\color{red}\text{needed for authentication}}$$ |[openssl](https://github.com/openssl/openssl)|
+|$${\color{red}\text{Required}}$$| $${\color{red}\text{ coreutils }}$$ | [issue#9](https://github.com/freeboxos/freeboxos-bash-api/issues/9) $${\color{red}\text{basic Unix / Linux tools}}$$ |[GNU coreutils](https://github.com/coreutils/coreutils)|
+|$${\color{red}\text{Required}}$$| $${\color{red}\text{ file }}$$ | [issue#9](https://github.com/freeboxos/freeboxos-bash-api/issues/9) $${\color{red}\text{needed to detect PEM certificates}}$$ |[file](https://github.com/file/file)|
+|$${\color{red}\text{Required}}$$| $${\color{red}\text{ websocat }}$$  | $${\color{red}\text{needed to use websocket API (VM console...)}}$$ |[websocat](https://github.com/vi/websocat/) |
+|$${\color{orange}\text{VM required}}$$| $${\color{orange}\text{ tigervnc }}$$  | $${\color{orange}\text{needed to access VM screen over websocket}}$$ |[tigervnc](https://github.com/TigerVNC/tigervnc) |
+|$${\color{yellow}\text{VM optional }}$$| $${\color{yellow}\text{ screen }}$$  | $${\color{yellow}\text{allow to launch VM console in a SCREEN}}$$ |[GNU screen](https://savannah.gnu.org/git/?group=screen) |
+|$${\color{yellow}\text{VM optional }}$$| $${\color{yellow}\text{ dtach }}$$  | $${\color{yellow}\text{allow to launch VM console detached from terminal}}$$ |[GNU dtach](https://github.com/crigler/dtach) |
+|$${\color{lightgreen}\text{Recommended}}$$| $${\color{lightgreen}\text{ jq }}$$ | $${\color{lightgreen}\text{needed for fast json parsing}}$$ |[jq](https://github.com/jqlang/jq)|
+
+<br/>
 
 
 --------------------------------------------------------------------------------------------------------------------
@@ -11,20 +30,29 @@ Tool for managing Freebox Delta Virtual Machines using API (fbx-delta-nba_bash_a
 --------------------------------------------------------------------------------------------------------------------
 
 
+### Download and configure the underlying library used by `fbxvm-ctrl`
 
 sourcing lib : fbx-delta-nba_bash_api.sh
 
-You can get the library here on this branch (at the time I'm writing, changes are not merged on the original project, so use the branch):
+You can get the library here on this branch:
 https://github.com/nbanb/fbx-delta-nba_bash_api.sh/tree/nbanb-freebox-api
 
-You need to have `curl` and `openssl` installed.
+You need to have required tools installed [EXTERNAL TOOLS](#TOOLS).
 
 Get the source:
 
     $ curl -L https://github.com/nbanb/fbx-delta-nba_bash_api.sh/raw/nbanb-freebox-api/fbx-delta-nba_bash_api.sh > fbx-delta-nba_bash_api.sh
 
+###### For a custom configuration of the library (custom domain name, custom TLS certificate, etc...) follow the [WIKI](https://github.com/nbanb/fbx-delta-nba_bash_api.sh/wiki) . 
+###### For a FRENCH QUICK START guide of the library, follow the [LIBRARY FRENCH QUICK START](https://github.com/nbanb/fbx-delta-nba_bash_api.sh/wiki/%5BFRENCH-QUICK-START%5D-Quick-Start-en-Fran%C3%A7ais) .  
 
-First get a token which allow this app to login Feebox Delta API :
+###### If you have a WINDOWS computer, follow [I-HAVE-A-WINDOWS-COMPUTER - NO BASH](https://github.com/nbanb/fbx-delta-nba_bash_api.sh/wiki/I-HAVE-A-WINDOWS-COMPUTER-%E2%80%90-NO-BASH) .  
+
+<br /> 
+
+-----
+
+### First get a token which allow this app to login Feebox Delta API :
 
 #### *  authorize_application *app_id* *app_name* *app_version* *device_name*
 It is used to obtain a token to identify a new application (need to be done only once)
