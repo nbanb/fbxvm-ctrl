@@ -98,6 +98,11 @@ no_arg_sourcing_context
 
 login_freebox "$MY_APP_ID" "$MY_APP_TOKEN"
 
+# Cleanup : logout à la fin du script
+cleanup() {
+    logout_freebox 2>/dev/null || true
+}
+trap cleanup EXIT
 
 # functions
 
